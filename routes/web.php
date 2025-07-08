@@ -2,6 +2,12 @@
 
 use App\Http\Controllers\V1\Admin\Auth\LoginController;
 use App\Http\Controllers\V1\Admin\Expense\ShowReceiptController;
+use App\Http\Controllers\V1\Admin\Report\AccountantExpensesCountryReportController;
+use App\Http\Controllers\V1\Admin\Report\AccountantExpensesSupplierReportController;
+use App\Http\Controllers\V1\Admin\Report\AccountantExpensesExpenseReportController;
+use App\Http\Controllers\V1\Admin\Report\AccountantIncomeInvoicesReportController;
+use App\Http\Controllers\V1\Admin\Report\AccountantIncomeCustomerReportController;
+use App\Http\Controllers\V1\Admin\Report\AccountantIncomeCountryReportController;
 use App\Http\Controllers\V1\Admin\Report\CustomerSalesReportController;
 use App\Http\Controllers\V1\Admin\Report\ExpensesReportController;
 use App\Http\Controllers\V1\Admin\Report\ItemSalesReportController;
@@ -69,6 +75,15 @@ Route::middleware('auth:sanctum')->prefix('reports')->group(function () {
     // report for profit and loss
     // ----------------------------------
     Route::get('/profit-loss/{hash}', ProfitLossReportController::class);
+
+    // accountant reports
+    // ----------------------------------
+    Route::get('/accountant/expenses/expense/{hash}', AccountantExpensesExpenseReportController::class);
+    Route::get('/accountant/expenses/supplier/{hash}', AccountantExpensesSupplierReportController::class);
+    Route::get('/accountant/expenses/country/{hash}', AccountantExpensesCountryReportController::class);
+    Route::get('/accountant/incomes/invoice/{hash}', AccountantIncomeInvoicesReportController::class);
+    Route::get('/accountant/incomes/customer/{hash}', AccountantIncomeCustomerReportController::class);
+    Route::get('/accountant/incomes/country/{hash}', AccountantIncomeCountryReportController::class);
 
     // download expense receipt
     // -------------------------------------------------

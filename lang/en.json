@@ -839,6 +839,24 @@
       "to_date": "To Date",
       "from_date": "From Date",
       "date_range": "Select Date Range"
+    },
+    "accountant": {
+      "expenses": {
+        "accountant": "Accountant - Expenses",
+        "type": {
+          "by_invoice_expense": "By Expense",
+          "by_invoice_supplier": "By Supplier",
+          "by_invoice_country": "By Country"
+        }
+      },
+      "incomes": {
+        "accountant": "Accountant - Incomes",
+        "type": {
+          "by_invoice_income": "By Invoice",
+          "by_invoice_customer": "By Customer",
+          "by_invoice_country": "By Country"
+        }
+      }
     }
   },
   "settings": {
@@ -1656,5 +1674,30 @@
   "mail_view_payment": "View Payment",
   "notification_view_estimate": "[Notification] Estimate viewed",
   "notification_view_invoice": "[Notification] Invoice viewed",
-  "You have received a new invoice from <b>{COMPANY_NAME}</b>.</br> Please download using the button below:": "You have received a new invoice from <b>{COMPANY_NAME}</b>.</br> Please download using the button below:"
+  "You have received a new invoice from <b>{COMPANY_NAME}</b>.</br> Please download using the button below:": "You have received a new invoice from <b>{COMPANY_NAME}</b>.</br> Please download using the button below:",
+  "pdf_supplier": "Supplier",
+  "pdf_price_vat_label": "VAT Amount",
+  "pdf_expense_count": "Number of Expenses",
+  "pdf_total_expenses": "Total Number of Expenses",
+  "pdf_expenses_eu_countries": "Expenses from EU Countries",
+  "pdf_expenses_home_country": "Expenses from home Country",
+  "pdf_expenses_uk": "Expenses from UK",
+  "pdf_expenses_outside_eu": "Expenses Outside EU",
+  "pdf_accountant_expenses_expense_report_label": "ACCOUNTANT REPORT BY EXPENSES",
+  "pdf_accountant_expenses_supplier_report_label": "ACCOUNTANT REPORT OF EXPENSES BY SUPPLIERS",
+  "pdf_accountant_expenses_county_report_label": "ACCOUNTANT REPORT OF EXPENSES BY COUNTRY",
+  "pdf_accountant_incomes_invoice_report_label": "ACCOUNTANT REPORT BY INVOICES",
+  "pdf_accountant_invoices_customer_report_label": "ACCOUNTANT REPORT OF INVOICES BY CUSTOMERS",
+  "pdf_accountant_invoices_county_report_label": "ACCOUNTANT REPORT OF INVOICES BY COUNTRY",
+  "pdf_customer": "Customer",
+  "pdf_payment_status": "Paid Status",
+  "pdf_invoice_count": "Number of Invoices",
+  "pdf_total_invoices": "Total number of Invoices",
+  "pdf_income_eu_countries": "Invoices from EU Countries",
+  "pdf_income_home_country": "Invoices from home Country",
+  "pdf_income_uk": "Invoices from UK",
+  "pdf_income_outside_eu": "Invoices Outside EU",
+  "pdf_paid_invoices":"Total Number of Paid Invoices",
+  "pdf_unpaid_invoices": "Total Number of Unpaid Invoices",
+  "pdf_partially_paid_invoices": "Total Number of Partially Paid Invoices"
 }

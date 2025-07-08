@@ -45,6 +45,19 @@
       >
         <TaxReport ref="report" />
       </BaseTab>
+      <BaseTab
+        :title="$t('reports.accountant.incomes.accountant')"
+        tab-panel-container="px-0 py-0"
+      >
+        <AccountantIncomesReport ref="report" />
+      </BaseTab>
+      <BaseTab
+        :title="$t('reports.accountant.expenses.accountant')"
+        tab-panel-container="px-0 py-0"
+      >
+        <AccountantExpensesReport ref="report" />
+      </BaseTab>
+
     </BaseTabGroup>
   </BasePage>
 </template>
@@ -55,6 +68,8 @@ import SalesReport from '../SalesReports.vue'
 import ExpenseReport from '../ExpensesReport.vue'
 import ProfitLossReport from '../ProfitLossReport.vue'
 import TaxReport from '../TaxReport.vue'
+import AccountantIncomesReport from '../AccountantIncomesReport.vue'
+import AccountantExpensesReport from '../AccountantExpensesReport.vue'
 import { useGlobalStore } from '@/scripts/admin/stores/global'
 
 const globalStore = useGlobalStore()
