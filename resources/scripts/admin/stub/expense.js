@@ -14,5 +14,15 @@ export default {
   customFields: [],
   fields: [],
   in_use: false,
-  selectedCurrency: null
+  selectedCurrency: null,
+  tax: 0,
+  base_tax: 0,
+  tax_per_item: 'NO',
+  taxes: [],
+  sales_tax_type: null,
+  sales_tax_address_type: null,
+  discount_per_item: 'NO',
+  discount: 0,
+  discount_type: 'fixed',
+  items: []
 }

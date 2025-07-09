@@ -32,6 +32,11 @@ class ExpenseResource extends JsonResource
             'currency_id' => $this->currency_id,
             'base_amount' => $this->base_amount,
             'payment_method_id' => $this->payment_method_id,
+            'tax' => $this->tax,
+            'base_tax' => $this->base_tax,
+            'tax_per_item' => $this->tax_per_item,
+            'sales_tax_type' => $this->sales_tax_type,
+            'sales_tax_address_type' => $this->sales_tax_address_type,
             'customer' => $this->when($this->customer()->exists(), function () {
                 return new CustomerResource($this->customer);
             }),
@@ -52,6 +57,9 @@ class ExpenseResource extends JsonResource
             }),
             'payment_method' => $this->when($this->paymentMethod()->exists(), function () {
                 return new PaymentMethodResource($this->paymentMethod);
+            }),
+            'taxes' => $this->when($this->taxes()->exists(), function () {
+                return TaxResource::collection($this->taxes);
             }),
         ];
     }

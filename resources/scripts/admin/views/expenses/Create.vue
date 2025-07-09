@@ -1,5 +1,6 @@
 <template>
   <CategoryModal />
+  <TaxTypeModal />
 
   <BasePage class="relative">
     <form action="" @submit.prevent="submitForm">
@@ -117,73 +118,6 @@
           </BaseInputGroup>
 
           <BaseInputGroup
-            :label="$t('expenses.expense_number')"
-            :content-loading="isFetchingInitialData"
-          >
-            <BaseInput
-              v-model="expenseStore.currentExpense.expense_number"
-              :content-loading="isFetchingInitialData"
-              type="text"
-              name="expense_number"
-              :placeholder="$t('expenses.expense_number_placeholder')"
-            />
-          </BaseInputGroup>
-
-          <BaseInputGroup
-            :label="$t('expenses.amount')"
-            :error="
-              v$.currentExpense.amount.$error &&
-              v$.currentExpense.amount.$errors[0].$message
-            "
-            :content-loading="isFetchingInitialData"
-            required
-          >
-            <BaseMoney
-              :key="expenseStore.currentExpense.selectedCurrency"
-              v-model="amountData"
-              class="focus:border focus:border-solid focus:border-primary-500"
-              :invalid="v$.currentExpense.amount.$error"
-              :currency="expenseStore.currentExpense.selectedCurrency"
-              @input="v$.currentExpense.amount.$touch()"
-            />
-          </BaseInputGroup>
-          <BaseInputGroup
-            :label="$t('expenses.currency')"
-            :content-loading="isFetchingInitialData"
-            :error="
-              v$.currentExpense.currency_id.$error &&
-              v$.currentExpense.currency_id.$errors[0].$message
-            "
-            required
-          >
-            <BaseMultiselect
-              v-model="expenseStore.currentExpense.currency_id"
-              value-prop="id"
-              label="name"
-              track-by="name"
-              :content-loading="isFetchingInitialData"
-              :options="globalStore.currencies"
-              searchable
-              :can-deselect="false"
-              :placeholder="$t('customers.select_currency')"
-              :invalid="v$.currentExpense.currency_id.$error"
-              class="w-full"
-              @update:modelValue="onCurrencyChange"
-            >
-            </BaseMultiselect>
-          </BaseInputGroup>
-
-          <!-- Exchange rate converter -->
-          <ExchangeRateConverter
-            :store="expenseStore"
-            store-prop="currentExpense"
-            :v="v$.currentExpense"
-            :is-loading="isFetchingInitialData"
-            :is-edit="isEdit"
-            :customer-currency="expenseStore.currentExpense.currency_id"
-          />
-
-          <BaseInputGroup
             :content-loading="isFetchingInitialData"
             :label="$t('expenses.customer')"
           >
@@ -200,6 +134,42 @@
               :delay="500"
               searchable
               :placeholder="$t('customers.select_a_customer')"
+            />
+          </BaseInputGroup>
+
+          <BaseInputGroup
+            :label="$t('expenses.expense_number')"
+            :content-loading="isFetchingInitialData"
+          >
+            <BaseInput
+              v-model="expenseStore.currentExpense.expense_number"
+              :content-loading="isFetchingInitialData"
+              type="text"
+              name="expense_number"
+              :placeholder="$t('expenses.expense_number_placeholder')"
+            />
+          </BaseInputGroup>
+
+          <BaseInputGroup
+            :label="$t('settings.currencies.currency')"
+            :error="
+              v$.currentExpense.currency_id.$error &&
+              v$.currentExpense.currency_id.$errors[0].$message
+            "
+            :content-loading="isFetchingInitialData"
+            required
+          >
+            <BaseMultiselect
+              v-model="expenseStore.currentExpense.currency_id"
+              :content-loading="isFetchingInitialData"
+              value-prop="id"
+              label="name"
+              track-by="id"
+              :options="globalStore.currencies"
+              :placeholder="$t('customers.select_currency')"
+              :invalid="v$.currentExpense.currency_id.$error"
+              @update:modelValue="onCurrencyChange"
+              @input="v$.currentExpense.currency_id.$touch()"
             />
           </BaseInputGroup>
 
@@ -228,6 +198,47 @@
               </template> -->
             </BaseMultiselect>
           </BaseInputGroup>
+
+          <BaseInputGroup
+            :label="$t('expenses.amount')"
+            :error="
+              v$.currentExpense.amount.$error &&
+              v$.currentExpense.amount.$errors[0].$message
+            "
+            :content-loading="isFetchingInitialData"
+            required
+          >
+            <BaseMoney
+              :key="expenseStore.currentExpense.selectedCurrency"
+              v-model="amountData"
+              class="focus:border focus:border-solid focus:border-primary-500"
+              :invalid="v$.currentExpense.amount.$error"
+              :currency="expenseStore.currentExpense.selectedCurrency"
+              @input="v$.currentExpense.amount.$touch()"
+            />
+          </BaseInputGroup>
+
+          <!-- Exchange Rate Converter (conditional) -->
+          <ExchangeRateConverter
+            :store="expenseStore"
+            store-prop="currentExpense"
+            :v="v$.currentExpense"
+            :is-loading="isFetchingInitialData"
+            :is-edit="isEdit"
+            :customer-currency="expenseStore.currentExpense.currency_id"
+          />
+
+          <!-- Tax Section -->
+          <div class="col-span-2">
+            <CreateTotal
+              :currency="expenseStore.currentExpense.selectedCurrency"
+              :is-loading="isFetchingInitialData"
+              :store="expenseStore"
+              store-prop="currentExpense"
+              tax-popup-type="expense"
+            />
+          </div>
+
 
           <BaseInputGroup
             :content-loading="isFetchingInitialData"
@@ -313,9 +324,12 @@ import { useCompanyStore } from '@/scripts/admin/stores/company'
 import { useCustomerStore } from '@/scripts/admin/stores/customer'
 import { useCustomFieldStore } from '@/scripts/admin/stores/custom-field'
 import { useModalStore } from '@/scripts/stores/modal'
+import { useTaxTypeStore } from '@/scripts/admin/stores/tax-type'
 import ExpenseCustomFields from '@/scripts/admin/components/custom-fields/CreateCustomFields.vue'
 import CategoryModal from '@/scripts/admin/components/modal-components/CategoryModal.vue'
+import TaxTypeModal from '@/scripts/admin/components/modal-components/TaxTypeModal.vue'
 import ExchangeRateConverter from '@/scripts/admin/components/estimate-invoice-common/ExchangeRateConverter.vue'
+import CreateTotal from '@/scripts/admin/components/estimate-invoice-common/CreateTotal.vue'
 import { useGlobalStore } from '@/scripts/admin/stores/global'
 
 const customerStore = useCustomerStore()
@@ -324,6 +338,7 @@ const expenseStore = useExpenseStore()
 const categoryStore = useCategoryStore()
 const customFieldStore = useCustomFieldStore()
 const modalStore = useModalStore()
+const taxTypeStore = useTaxTypeStore()
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
@@ -426,6 +441,12 @@ function onCurrencyChange(v) {
   expenseStore.currentExpense.selectedCurrency = globalStore.currencies.find(
     (c) => c.id === v
   )
+  // Manually trigger the exchange rate check
+  if (v && v !== companyStore.selectedCompanyCurrency.id) {
+    expenseStore.showExchangeRate = true
+  } else {
+    expenseStore.showExchangeRate = false
+  }
 }
 
 async function searchCategory(search) {
@@ -461,13 +482,19 @@ async function loadData() {
   }
 
   isFetchingInitialData.value = true
+  await globalStore.fetchCurrencies()
   await expenseStore.fetchPaymentModes({ limit: 'all' })
+  await taxTypeStore.fetchTaxTypes({ limit: 'all' })
 
   if (isEdit.value) {
     const expenseData = await expenseStore.fetchExpense(route.params.id)
 
-    expenseStore.currentExpense.currency_id =
-      expenseStore.currentExpense.selectedCurrency.id
+    // Ensure selectedCurrency is set if not already set by fetchExpense
+    if (!expenseStore.currentExpense.selectedCurrency && expenseStore.currentExpense.currency_id) {
+      expenseStore.currentExpense.selectedCurrency = globalStore.currencies.find(
+        (c) => c.id === expenseStore.currentExpense.currency_id
+      )
+    }
 
     if(expenseData.data) {
       if(!categoryStore.editCategory && expenseData.data.data.expense_category) {
@@ -497,7 +524,9 @@ async function submitForm() {
 
   let formData = {
     ...expenseStore.currentExpense,
-    expense_number: expenseStore.currentExpense.expense_number || ''
+    expense_number: expenseStore.currentExpense.expense_number || '',
+    taxes: expenseStore.currentExpense.taxes || [],
+    tax: expenseStore.getTotalTax
   }
 
   try {

@@ -65,6 +65,11 @@ class Tax extends Model
         return $this->belongsTo(Item::class);
     }
 
+    public function expense(): BelongsTo
+    {
+        return $this->belongsTo(Expense::class);
+    }
+
     public function scopeWhereCompany($query, $company_id)
     {
         $query->where('company_id', $company_id);

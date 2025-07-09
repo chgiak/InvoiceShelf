@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -66,6 +67,11 @@ class Expense extends Model implements HasMedia
     public function creator(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'creator_id');
+    }
+
+    public function taxes(): HasMany
+    {
+        return $this->hasMany(Tax::class);
     }
 
     public function getFormattedExpenseDateAttribute($value)
@@ -247,6 +253,10 @@ class Expense extends Model implements HasMedia
             $expense->addMediaFromRequest('attachment_receipt')->toMediaCollection('receipts');
         }
 
+        if ($request->taxes) {
+            $expense->createTaxes($request->taxes);
+        }
+
         if ($request->customFields) {
             $expense->addCustomFields(json_decode($request->customFields));
         }
@@ -274,10 +284,33 @@ class Expense extends Model implements HasMedia
             $this->addMediaFromRequest('attachment_receipt')->toMediaCollection('receipts');
         }
 
+        if ($request->taxes) {
+            $this->updateTaxes($request->taxes);
+        }
+
         if ($request->customFields) {
             $this->updateCustomFields(json_decode($request->customFields));
         }
 
         return true;
+    }
+
+    public function createTaxes($taxes)
+    {
+        foreach ($taxes as $tax) {
+            $tax['company_id'] = $this->company_id;
+            $tax['expense_id'] = $this->id;
+            $tax['currency_id'] = $this->currency_id;
+            $tax['amount'] = $tax['amount'] * $this->exchange_rate;
+
+            $this->taxes()->create($tax);
+        }
+    }
+
+    public function updateTaxes($taxes)
+    {
+        $this->taxes()->delete();
+
+        $this->createTaxes($taxes);
     }
 }

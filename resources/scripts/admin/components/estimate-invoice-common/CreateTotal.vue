@@ -72,8 +72,10 @@
 
     <div
       v-if="
-        store[storeProp].discount_per_item === 'NO' ||
-        store[storeProp].discount_per_item === null
+        taxPopupType !== 'expense' && (
+          store[storeProp].discount_per_item === 'NO' ||
+          store[storeProp].discount_per_item === null
+        )
       "
       class="flex items-center justify-between w-full mt-2"
     >

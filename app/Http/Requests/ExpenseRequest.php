@@ -58,6 +58,42 @@ class ExpenseRequest extends FormRequest
                 'mimes:jpg,png,pdf,doc,docx,xls,xlsx,ppt,pptx',
                 'max:20000',
             ],
+            'tax' => [
+                'nullable',
+                'numeric',
+            ],
+            'taxes' => [
+                'nullable',
+                'array',
+            ],
+            'taxes.*.name' => [
+                'required_with:taxes',
+            ],
+            'taxes.*.calculation_type' => [
+                'required_with:taxes',
+                'in:percentage,fixed',
+            ],
+            'taxes.*.amount' => [
+                'required_with:taxes',
+                'numeric',
+            ],
+            'taxes.*.tax_type_id' => [
+                'required_with:taxes',
+                'numeric',
+            ],
+            'tax_per_item' => [
+                'nullable',
+                'string',
+                'in:YES,NO',
+            ],
+            'sales_tax_type' => [
+                'nullable',
+                'string',
+            ],
+            'sales_tax_address_type' => [
+                'nullable',
+                'string',
+            ],
         ];
 
         if ($companyCurrency && $this->currency_id) {
@@ -84,6 +120,11 @@ class ExpenseRequest extends FormRequest
                 'exchange_rate' => $exchange_rate,
                 'base_amount' => $this->amount * $exchange_rate,
                 'currency_id' => $current_currency,
+                'tax' => $this->tax ?: 0,
+                'base_tax' => ($this->tax ?: 0) * $exchange_rate,
+                'tax_per_item' => $this->tax_per_item ?: 'NO',
+                'sales_tax_type' => $this->sales_tax_type,
+                'sales_tax_address_type' => $this->sales_tax_address_type,
             ])
             ->toArray();
     }

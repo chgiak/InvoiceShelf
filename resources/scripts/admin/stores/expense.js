@@ -27,6 +27,46 @@ export const useExpenseStore = (useWindow = false) => {
     getters: {
       getCurrentExpense: (state) => state.currentExpense,
       getSelectedExpenses: (state) => state.selectedExpenses,
+      
+      getTotalSimpleTax: (state) => {
+        if (!state.currentExpense.taxes) return 0
+        return state.currentExpense.taxes
+          .filter((tax) => !tax.compound_tax)
+          .reduce((total, tax) => total + tax.amount, 0)
+      },
+
+      getTotalCompoundTax: (state) => {
+        if (!state.currentExpense.taxes) return 0
+        return state.currentExpense.taxes
+          .filter((tax) => tax.compound_tax)
+          .reduce((total, tax) => total + tax.amount, 0)
+      },
+
+      getTotalTax: (state) => {
+        if (!state.currentExpense.taxes) return 0
+        return state.currentExpense.taxes.reduce((total, tax) => total + tax.amount, 0)
+      },
+
+      getSubTotal: (state) => {
+        return state.currentExpense.amount || 0
+      },
+
+      getSubtotalWithDiscount: (state) => {
+        // Expenses don't have discounts, so return the same as subtotal
+        return state.currentExpense.amount || 0
+      },
+
+      getTotal: (state) => {
+        const subtotal = state.currentExpense.amount || 0
+        const totalTax = state.currentExpense.taxes ? 
+          state.currentExpense.taxes.reduce((total, tax) => total + tax.amount, 0) : 0
+        return subtotal + totalTax
+      },
+
+      getItemTaxes: (state) => {
+        // Expenses don't have item taxes
+        return []
+      },
     },
 
     actions: {
@@ -62,6 +102,12 @@ export const useExpenseStore = (useWindow = false) => {
                 this.currentExpense.selectedCurrency =
                   response.data.data.currency
                 this.currentExpense.attachment_receipt = null
+                
+                // Initialize taxes array if not exists
+                if (!this.currentExpense.taxes) {
+                  this.currentExpense.taxes = []
+                }
+                
                 if (response.data.data.attachment_receipt_url) {
                   if (
                     utils.isImageFile(
@@ -121,30 +167,55 @@ export const useExpenseStore = (useWindow = false) => {
       updateExpense({ id, data, isAttachmentReceiptRemoved }) {
         const notificationStore = useNotificationStore()
 
-        const formData = utils.toFormData(data)
+        // If there's a file attachment, use FormData
+        if (data.attachment_receipt) {
+          const formData = utils.toFormData(data)
+          formData.append('_method', 'PUT')
+          formData.append('is_attachment_receipt_removed', isAttachmentReceiptRemoved)
 
-        formData.append('_method', 'PUT')
-        formData.append('is_attachment_receipt_removed', isAttachmentReceiptRemoved)
+          return new Promise((resolve, reject) => {
+            axios.post(`/api/v1/expenses/${id}`, formData).then((response) => {
+              let pos = this.expenses.findIndex(
+                (expense) => expense.id === response.data.id
+              )
 
-        return new Promise((resolve) => {
-          axios.post(`/api/v1/expenses/${id}`, formData).then((response) => {
-            let pos = this.expenses.findIndex(
-              (expense) => expense.id === response.data.id
-            )
+              this.expenses[pos] = response.data.data
 
-            this.expenses[pos] = data.expense
+              notificationStore.showNotification({
+                type: 'success',
+                message: global.t('expenses.updated_message'),
+              })
 
-            notificationStore.showNotification({
-              type: 'success',
-              message: global.t('expenses.updated_message'),
+              resolve(response)
+            }).catch((err) => {
+              handleError(err)
+              reject(err)
             })
-
-            resolve(response)
           })
-        }).catch((err) => {
-          handleError(err)
-          reject(err)
-        })
+        } else {
+          // Otherwise use JSON request like invoices
+          data.is_attachment_receipt_removed = isAttachmentReceiptRemoved
+          
+          return new Promise((resolve, reject) => {
+            axios.put(`/api/v1/expenses/${id}`, data).then((response) => {
+              let pos = this.expenses.findIndex(
+                (expense) => expense.id === response.data.id
+              )
+
+              this.expenses[pos] = response.data.data
+
+              notificationStore.showNotification({
+                type: 'success',
+                message: global.t('expenses.updated_message'),
+              })
+
+              resolve(response)
+            }).catch((err) => {
+              handleError(err)
+              reject(err)
+            })
+          })
+        }
       },
 
       setSelectAllState(data) {

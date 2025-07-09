@@ -676,6 +676,7 @@
     "created_message": "Expense created successfully",
     "updated_message": "Expense updated successfully",
     "deleted_message": "Expense deleted successfully | Expenses deleted successfully",
+    "tax": "Expense Tax",
     "categories": {
       "categories_list": "Categories List",
       "title": "Title",

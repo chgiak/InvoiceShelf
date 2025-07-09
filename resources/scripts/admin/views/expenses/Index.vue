@@ -184,6 +184,13 @@
           />
         </template>
 
+        <template #cell-tax="{ row }">
+          <BaseFormatMoney
+            :amount="row.data.tax || 0"
+            :currency="row.data.currency"
+          />
+        </template>
+
         <template #cell-expense_date="{ row }">
           {{ row.data.formatted_expense_date }}
         </template>
@@ -300,6 +307,7 @@ const expenseColumns = computed(() => {
     { key: 'user_name', label: t('expenses.customer') },
     { key: 'notes', label: t('expenses.note') },
     { key: 'amount', label: t('expenses.amount') },
+    { key: 'tax', label: t('expenses.tax') },
     {
       key: 'actions',
       sortable: false,
