@@ -22,7 +22,7 @@ class ExpensesController extends Controller
 
         $limit = $request->has('limit') ? $request->limit : 10;
 
-        $expenses = Expense::with('category', 'creator', 'fields', 'taxes')
+        $expenses = Expense::with('category', 'creator', 'fields', 'taxes', 'currency')
             ->whereCompany()
             ->leftJoin('customers', 'customers.id', '=', 'expenses.customer_id')
             ->join('expense_categories', 'expense_categories.id', '=', 'expenses.expense_category_id')
@@ -59,7 +59,7 @@ class ExpensesController extends Controller
     {
         $this->authorize('view', $expense);
 
-        $expense->load('taxes');
+        $expense->load('taxes', 'currency');
 
         return new ExpenseResource($expense);
     }
